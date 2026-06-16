@@ -1,0 +1,22 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.4.4">
+
+  <ItemGroup>
+    <ProjectReference Include="..\HotelBooking.Api\HotelBooking.Api.csproj" />
+    <ProjectReference Include="..\HotelBooking.Worker\HotelBooking.Worker.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.4.4" />
+    <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="13.4.4" />
+    <PackageReference Include="MessagePack" Version="3.1.7" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>6a2d537b-7ea6-4485-8693-08d285fbe2b0</UserSecretsId>
+  </PropertyGroup>
+
+</Project>

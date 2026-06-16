@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: hotel-booking-postgres
+    environment:
+      POSTGRES_DB: hotelbooking
+      POSTGRES_USER: hotelbooking
+      POSTGRES_PASSWORD: hotelbooking
+    ports:
+      - "5432:5432"
+    volumes:
+      - hotel-booking-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hotelbooking -d hotelbooking"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:4-management-alpine
+    container_name: hotel-booking-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: hotelbooking
+      RABBITMQ_DEFAULT_PASS: hotelbooking
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - hotel-booking-rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  hotel-booking-postgres-data:
+  hotel-booking-rabbitmq-data:

@@ -1,0 +1,28 @@
+bin/
+obj/
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.swp
+
+# .NET
+TestResults/
+*.trx
+coverage/
+coverage.cobertura.xml
+
+# Aspire / local infrastructure
+.aspire/
+
+# Node / frontend
+node_modules/
+.next/
+dist/
+out/
+
+# Environment
+.env
+.env.*
+!.env.example

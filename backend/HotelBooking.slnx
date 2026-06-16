@@ -1,0 +1,22 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/HotelBooking.Api/HotelBooking.Api.csproj" />
+    <Project Path="src/HotelBooking.AppHost/HotelBooking.AppHost.csproj" />
+    <Project Path="src/HotelBooking.BuildingBlocks/HotelBooking.BuildingBlocks.csproj" />
+    <Project Path="src/HotelBooking.Modules.Booking/HotelBooking.Modules.Booking.csproj" />
+    <Project Path="src/HotelBooking.Modules.Identity/HotelBooking.Modules.Identity.csproj" />
+    <Project Path="src/HotelBooking.Modules.Inventory/HotelBooking.Modules.Inventory.csproj" />
+    <Project Path="src/HotelBooking.Modules.Notification/HotelBooking.Modules.Notification.csproj" />
+    <Project Path="src/HotelBooking.Modules.Payment/HotelBooking.Modules.Payment.csproj" />
+    <Project Path="src/HotelBooking.Modules.Pricing/HotelBooking.Modules.Pricing.csproj" />
+    <Project Path="src/HotelBooking.Modules.Property/HotelBooking.Modules.Property.csproj" />
+    <Project Path="src/HotelBooking.ServiceDefaults/HotelBooking.ServiceDefaults.csproj" />
+    <Project Path="src/HotelBooking.SharedKernel/HotelBooking.SharedKernel.csproj" />
+    <Project Path="src/HotelBooking.Worker/HotelBooking.Worker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/HotelBooking.ArchitectureTests/HotelBooking.ArchitectureTests.csproj" />
+    <Project Path="tests/HotelBooking.IntegrationTests/HotelBooking.IntegrationTests.csproj" />
+    <Project Path="tests/HotelBooking.UnitTests/HotelBooking.UnitTests.csproj" />
+  </Folder>
+</Solution>
