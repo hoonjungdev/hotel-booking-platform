@@ -1,3 +1,5 @@
+using HotelBooking.SharedKernel.Exceptions;
+
 namespace HotelBooking.SharedKernel.ValueObjects;
 
 public sealed record StayDateRange

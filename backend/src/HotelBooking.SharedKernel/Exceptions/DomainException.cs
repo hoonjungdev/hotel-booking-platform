@@ -1,4 +1,4 @@
-namespace HotelBooking.SharedKernel;
+namespace HotelBooking.SharedKernel.Exceptions;
 
 public sealed class DomainException : Exception
 {

@@ -1,4 +1,4 @@
-using HotelBooking.SharedKernel;
+using HotelBooking.SharedKernel.Exceptions;
 using HotelBooking.SharedKernel.ValueObjects;
 
 namespace HotelBooking.UnitTests.SharedKernel.ValueObjects;
