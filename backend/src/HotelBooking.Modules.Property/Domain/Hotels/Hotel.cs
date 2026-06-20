@@ -65,6 +65,7 @@ public sealed class Hotel
         string defaultLanguage,
         DateTimeOffset createdAt)
     {
+        ValidateHotelId(id);
         string normalizedName = ValidateName(name);
         string normalizedSlug = ValidateSlug(slug);
         ValidateTimeZoneId(timeZoneId);
@@ -226,6 +227,14 @@ public sealed class Hotel
         if (HotelPolicy is null)
         {
             throw new DomainArgumentException("Hotel policy is required before publishing.", nameof(HotelPolicy));
+        }
+    }
+
+    private static void ValidateHotelId(HotelId id)
+    {
+        if (id == default)
+        {
+            throw new DomainArgumentException("Hotel ID is required", nameof(id));
         }
     }
 

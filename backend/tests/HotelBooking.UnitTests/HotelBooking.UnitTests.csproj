@@ -23,6 +23,7 @@
     <ProjectReference Include="..\..\src\HotelBooking.Modules.Booking\HotelBooking.Modules.Booking.csproj" />
     <ProjectReference Include="..\..\src\HotelBooking.Modules.Inventory\HotelBooking.Modules.Inventory.csproj" />
     <ProjectReference Include="..\..\src\HotelBooking.Modules.Pricing\HotelBooking.Modules.Pricing.csproj" />
+    <ProjectReference Include="..\..\src\HotelBooking.Modules.Property\HotelBooking.Modules.Property.csproj" />
   </ItemGroup>
 
 </Project>

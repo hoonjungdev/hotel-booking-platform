@@ -21,6 +21,11 @@ public readonly record struct HotelId
         return new HotelId(Guid.NewGuid());
     }
 
+    public static HotelId From(Guid value)
+    {
+        return new HotelId(value);
+    }
+
     public override string ToString()
     {
         return Value.ToString();
