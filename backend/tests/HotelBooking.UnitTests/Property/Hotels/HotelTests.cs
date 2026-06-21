@@ -1,4 +1,5 @@
 using HotelBooking.Modules.Property.Domain.Hotels;
+using HotelBooking.Modules.Property.Domain.Hotels.Events;
 using HotelBooking.Modules.Property.Domain.Hotels.ValueObjects;
 using HotelBooking.SharedKernel.Exceptions;
 
@@ -296,7 +297,7 @@ public class HotelTests
     {
         Hotel hotel = CreateDraftHotel();
 
-        Assert.Throws<DomainException>(hotel.Publish);
+        Assert.Throws<DomainException>(() => hotel.Publish(DateTimeOffset.UtcNow));
     }
 
     [Fact]
@@ -306,9 +307,40 @@ public class HotelTests
 
         hotel.SubmitForReview();
 
-        hotel.Publish();
+        hotel.Publish(DateTimeOffset.UtcNow);
 
         Assert.Equal(HotelStatus.Active, hotel.Status);
+    }
+
+    [Fact]
+    public void Publish_raises_hotel_published_domain_event()
+    {
+        Hotel hotel = CreateReadyDraftHotel();
+
+        hotel.SubmitForReview();
+
+        DateTimeOffset publishedAt = new(2026, 7, 1, 10, 0, 0, TimeSpan.Zero);
+
+        hotel.Publish(publishedAt);
+
+        HotelPublishedDomainEvent domainEvent = Assert.Single(hotel.DomainEvents.OfType<HotelPublishedDomainEvent>());
+
+        Assert.Equal(hotel.Id, domainEvent.HotelId);
+        Assert.Equal(publishedAt, domainEvent.OccurredAt);
+    }
+
+    [Fact]
+    public void Publish_does_not_raise_event_when_hotel_is_not_pending_review()
+    {
+        Hotel hotel = CreateDraftHotel();
+
+        Assert.Throws<DomainException>(
+            () => hotel.Publish(
+                new DateTimeOffset(2026, 7, 1, 10, 0, 0, TimeSpan.Zero)));
+
+        Assert.DoesNotContain(
+            hotel.DomainEvents,
+            domainEvent => domainEvent is HotelPublishedDomainEvent);
     }
 
     [Fact]
@@ -318,7 +350,7 @@ public class HotelTests
 
         hotel.SubmitForReview();
 
-        hotel.Publish();
+        hotel.Publish(DateTimeOffset.UtcNow);
 
         hotel.Suspend();
 
@@ -340,7 +372,7 @@ public class HotelTests
 
         hotel.SubmitForReview();
 
-        hotel.Publish();
+        hotel.Publish(DateTimeOffset.UtcNow);
 
         hotel.Close();
 
@@ -354,7 +386,7 @@ public class HotelTests
 
         hotel.SubmitForReview();
 
-        hotel.Publish();
+        hotel.Publish(DateTimeOffset.UtcNow);
 
         hotel.Close();
 
@@ -372,7 +404,7 @@ public class HotelTests
 
         hotel.SubmitForReview();
 
-        hotel.Publish();
+        hotel.Publish(DateTimeOffset.UtcNow);
 
         hotel.Suspend();
 

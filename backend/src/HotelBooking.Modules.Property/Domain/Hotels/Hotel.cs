@@ -1,11 +1,12 @@
+using HotelBooking.Modules.Property.Domain.Hotels.Events;
 using HotelBooking.Modules.Property.Domain.Hotels.ValueObjects;
+using HotelBooking.SharedKernel.Domain;
 using HotelBooking.SharedKernel.Exceptions;
 
 namespace HotelBooking.Modules.Property.Domain.Hotels;
 
-public sealed class Hotel
+public sealed class Hotel : AggregateRoot<HotelId>
 {
-    public HotelId Id { get; private set; }
     public string Name { get; private set; } = null!;
 
     public string Slug { get; private set; } = null!;
@@ -96,7 +97,7 @@ public sealed class Hotel
         Status = HotelStatus.PendingReview;
     }
 
-    public void Publish()
+    public void Publish(DateTimeOffset publishedAt)
     {
         if (Status != HotelStatus.PendingReview)
         {
@@ -106,6 +107,9 @@ public sealed class Hotel
         ValidatePublished();
 
         Status = HotelStatus.Active;
+        UpdatedAt = publishedAt;
+
+        RaiseDomainEvent(new HotelPublishedDomainEvent(Id, publishedAt));
     }
 
     public void Suspend()
