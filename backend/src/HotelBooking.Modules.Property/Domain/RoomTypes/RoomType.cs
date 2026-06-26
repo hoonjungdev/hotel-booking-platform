@@ -18,6 +18,7 @@ public sealed class RoomType : AggregateRoot<RoomTypeId>
     public DateTimeOffset CreatedAt { get; private set; }
     public DateTimeOffset? UpdatedAt { get; private set; }
     public IReadOnlyList<BedComposition> BedCompositions => _bedCompositions.AsReadOnly();
+    public bool IsSellable => Status == RoomTypeStatus.Active;
 
     private RoomType()
     {
@@ -106,5 +107,50 @@ public sealed class RoomType : AggregateRoot<RoomTypeId>
             occupancy,
             bedCompositions,
             createdAt);
+    }
+
+    public void Activate()
+    {
+        if (Status != RoomTypeStatus.Draft)
+        {
+            throw new DomainException("Room type cannot be activated from the current status. Current status: " + Status);
+        }
+
+        Status = RoomTypeStatus.Active;
+    }
+
+    public void Suspend()
+    {
+        if (Status != RoomTypeStatus.Active)
+        {
+            throw new DomainException("Room type cannot be suspended from the current status. Current status: " + Status);
+        }
+
+        Status = RoomTypeStatus.Suspended;
+    }
+
+    public void Close()
+    {
+        if (Status == RoomTypeStatus.Closed)
+        {
+            return;
+        }
+
+        Status = RoomTypeStatus.Closed;
+    }
+
+    public void Reactivate()
+    {
+        if (Status != RoomTypeStatus.Suspended)
+        {
+            throw new DomainException("Room type cannot be reactivated from the current status. Current status: " + Status);
+        }
+
+        Status = RoomTypeStatus.Active;
+    }
+
+    public bool CanAccommodate(int adults, int children)
+    {
+        return Occupancy.CanAccommodate(adults, children);
     }
 }

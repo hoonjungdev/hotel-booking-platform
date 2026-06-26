@@ -44,4 +44,13 @@ public sealed record Occupancy
 
         return new Occupancy(maxAdults, maxChildren, maxOccupancy);
     }
+
+    public bool CanAccommodate(int adults, int children)
+    {
+        return adults <= MaxAdults
+            && adults > 0
+            && children <= MaxChildren
+            && children >= 0
+            && adults + children <= MaxOccupancy;
+    }
 }

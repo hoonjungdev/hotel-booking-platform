@@ -199,4 +199,163 @@ public class RoomTypeTests
         Assert.Equal(BedType.Single, roomType.BedCompositions[0].BedType);
         Assert.Equal(1, roomType.BedCompositions[0].Quantity);
     }
+
+    [Fact]
+    public void Activate_changes_draft_room_type_to_active()
+    {
+        RoomType roomType = CreateDraftRoomType();
+
+        roomType.Activate();
+
+        Assert.Equal(RoomTypeStatus.Active, roomType.Status);
+    }
+
+    [Theory]
+    [InlineData(RoomTypeStatus.Active)]
+    [InlineData(RoomTypeStatus.Suspended)]
+    [InlineData(RoomTypeStatus.Closed)]
+    public void Activate_throws_exception_if_room_type_is_not_draft(RoomTypeStatus status)
+    {
+        RoomType roomType = CreateRoomTypeWithStatus(status);
+
+        Assert.Throws<DomainException>(roomType.Activate);
+
+        Assert.Equal(status, roomType.Status);
+    }
+
+    [Fact]
+    public void Suspend_changes_active_room_type_to_suspended()
+    {
+        RoomType roomType = CreateDraftRoomType();
+
+        roomType.Activate();
+
+        roomType.Suspend();
+
+        Assert.Equal(RoomTypeStatus.Suspended, roomType.Status);
+    }
+
+    [Theory]
+    [InlineData(RoomTypeStatus.Draft)]
+    [InlineData(RoomTypeStatus.Suspended)]
+    [InlineData(RoomTypeStatus.Closed)]
+    public void Suspend_throws_exception_if_room_type_is_not_active(RoomTypeStatus status)
+    {
+        RoomType roomType = CreateRoomTypeWithStatus(status);
+
+        Assert.Throws<DomainException>(roomType.Suspend);
+
+        Assert.Equal(status, roomType.Status);
+    }
+
+    [Theory]
+    [InlineData(RoomTypeStatus.Draft)]
+    [InlineData(RoomTypeStatus.Active)]
+    [InlineData(RoomTypeStatus.Suspended)]
+    [InlineData(RoomTypeStatus.Closed)]
+    public void Close_changes_any_room_type_to_closed(RoomTypeStatus status)
+    {
+        RoomType roomType = CreateRoomTypeWithStatus(status);
+
+        roomType.Close();
+
+        Assert.Equal(RoomTypeStatus.Closed, roomType.Status);
+    }
+
+    [Fact]
+    public void Reactivate_changes_suspended_room_type_to_active()
+    {
+        RoomType roomType = CreateSuspendedRoomType();
+
+        roomType.Reactivate();
+
+        Assert.Equal(RoomTypeStatus.Active, roomType.Status);
+    }
+
+    [Theory]
+    [InlineData(RoomTypeStatus.Draft)]
+    [InlineData(RoomTypeStatus.Active)]
+    [InlineData(RoomTypeStatus.Closed)]
+    public void Reactivate_throws_exception_if_room_type_is_not_suspended(RoomTypeStatus status)
+    {
+        RoomType roomType = CreateRoomTypeWithStatus(status);
+
+        Assert.Throws<DomainException>(roomType.Reactivate);
+
+        Assert.Equal(status, roomType.Status);
+    }
+
+    [Theory]
+    [InlineData(RoomTypeStatus.Draft, false)]
+    [InlineData(RoomTypeStatus.Active, true)]
+    [InlineData(RoomTypeStatus.Suspended, false)]
+    [InlineData(RoomTypeStatus.Closed, false)]
+    public void IsSellable_returns_true_only_when_room_type_is_active(RoomTypeStatus status, bool expected)
+    {
+        RoomType roomType = CreateRoomTypeWithStatus(status);
+
+        Assert.Equal(expected, roomType.IsSellable);
+    }
+
+    [Theory]
+    [InlineData(1, 1)]
+    [InlineData(1, 0)]
+    public void CanAccommodate_returns_true_when_guest_occupancy_fits_room_type(
+        int adults,
+        int children)
+    {
+        RoomType roomType = CreateRoomTypeWithStatus(RoomTypeStatus.Active);
+
+        Assert.True(roomType.CanAccommodate(adults, children));
+    }
+
+    private static RoomType CreateRoomTypeWithStatus(RoomTypeStatus status)
+    {
+        return status switch {
+            RoomTypeStatus.Draft => CreateDraftRoomType(),
+            RoomTypeStatus.Active => CreateActiveRoomType(),
+            RoomTypeStatus.Suspended => CreateSuspendedRoomType(),
+            RoomTypeStatus.Closed => CreateClosedRoomType(),
+            _ => throw new ArgumentOutOfRangeException(nameof(status), status, null)
+        };
+    }
+
+    private static RoomType CreateDraftRoomType()
+    {
+        return RoomType.CreateDraft(
+            RoomTypeId.Create(),
+            HotelId.Create(),
+            "Standard Room",
+            RoomTypeCode.Create("STD"),
+            Occupancy.Create(2, 1, 2),
+            [BedComposition.Create(BedType.Single, 1)],
+            new DateTimeOffset(2026, 7, 1, 10, 0, 0, TimeSpan.Zero));
+    }
+
+    private static RoomType CreateActiveRoomType()
+    {
+        RoomType roomType = CreateDraftRoomType();
+
+        roomType.Activate();
+
+        return roomType;
+    }
+
+    private static RoomType CreateSuspendedRoomType()
+    {
+        RoomType roomType = CreateActiveRoomType();
+
+        roomType.Suspend();
+
+        return roomType;
+    }
+
+    private static RoomType CreateClosedRoomType()
+    {
+        RoomType roomType = CreateActiveRoomType();
+
+        roomType.Close();
+
+        return roomType;
+    }
 }

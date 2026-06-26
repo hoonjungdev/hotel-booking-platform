@@ -56,4 +56,19 @@ public class OccupancyTests
     {
         Assert.Throws<DomainArgumentException>(() => Occupancy.Create(1, 3, 2));
     }
+
+    [Theory]
+    [InlineData(1, 0)]
+    [InlineData(1, 1)]
+    [InlineData(2, 0)]
+    [InlineData(2, 1)]
+    [InlineData(2, 2)]
+    public void CanAccommodate_returns_true_when_guest_occupancy_fits_room_type(
+        int adults,
+        int children)
+    {
+        var occupancy = Occupancy.Create(2, 2, 4);
+
+        Assert.True(occupancy.CanAccommodate(adults, children));
+    }
 }
