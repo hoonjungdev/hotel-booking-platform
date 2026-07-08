@@ -77,6 +77,36 @@ Frontend implementation guidance:
 - Prefer polished, usable product screens over marketing pages.
 - The frontend should help demonstrate booking flow, inventory/rate management, event timelines, and outbox/message reliability.
 
+## Git Commit Policy
+
+When creating or rewriting commits, Codex must use Conventional Commits.
+
+Commit message format:
+
+```text
+<type>(<scope>): <summary>
+```
+
+Use a scope when it adds useful context. Prefer module or layer scopes such as `property`, `inventory`, `booking`, `pricing`, `shared-kernel`, `api`, `worker`, `frontend`, `docs`, or `tests`.
+
+Common commit types:
+
+- `feat`: a new domain, application, API, frontend, or infrastructure capability
+- `fix`: a bug fix or behavioral correction
+- `test`: test-only additions or corrections
+- `refactor`: behavior-preserving code restructuring
+- `docs`: documentation-only changes
+- `chore`: tooling, project configuration, dependency, or maintenance changes
+
+Examples:
+
+- `feat(inventory): add inventory date quantity model`
+- `test(property): add room type lifecycle coverage`
+- `refactor(shared-kernel): standardize domain exceptions`
+- `docs: update Codex implementation guidance`
+
+Before committing, check recent history with `git log --oneline -n 10` and keep new commit messages consistent with the repository's existing style. If rewriting a previous commit message, preserve the commit's code changes and only adjust the message unless the user explicitly asks for content changes.
+
 ## Teaching Style
 
 When helping the user, prefer this loop:
