@@ -5,23 +5,39 @@ using HotelBooking.SharedKernel.ValueObjects;
 
 namespace HotelBooking.Modules.Inventory.Domain.InventoryHolds;
 
+/// <summary>
+/// Represents an atomic temporary claim on room type inventory for every occupied stay date.
+/// </summary>
 public sealed class InventoryHold : AggregateRoot<InventoryHoldId>
 {
+    /// <summary>Defines the first-version payment window for a held inventory claim.</summary>
     public static readonly TimeSpan ExpirationWindow = TimeSpan.FromMinutes(10);
 
     private readonly List<InventoryHoldLine> _lines = [];
 
+    /// <summary>Gets the reservation that owns this hold.</summary>
     public ReservationId ReservationId { get; private set; }
+    /// <summary>Gets the hotel whose inventory is held.</summary>
     public HotelId HotelId { get; private set; }
+    /// <summary>Gets the held room type.</summary>
     public RoomTypeId RoomTypeId { get; private set; }
+    /// <summary>Gets the stay date range covered by the hold.</summary>
     public StayDateRange StayDateRange { get; private set; } = null!;
+    /// <summary>Gets the quantity held on every occupied date.</summary>
     public int Quantity { get; private set; }
+    /// <summary>Gets the current hold lifecycle status.</summary>
     public InventoryHoldStatus Status { get; private set; }
+    /// <summary>Gets the explicit time at which inventory was held.</summary>
     public DateTimeOffset CreatedAt { get; private set; }
+    /// <summary>Gets the boundary at which the hold becomes expired.</summary>
     public DateTimeOffset ExpiresAt { get; private set; }
+    /// <summary>Gets when the hold was released, if released.</summary>
     public DateTimeOffset? ReleasedAt { get; private set; }
+    /// <summary>Gets when the hold was confirmed, if confirmed.</summary>
     public DateTimeOffset? ConfirmedAt { get; private set; }
+    /// <summary>Gets when the hold was marked expired, if expired.</summary>
     public DateTimeOffset? ExpiredAt { get; private set; }
+    /// <summary>Gets the immutable occupied-date claims belonging to this hold.</summary>
     public IReadOnlyList<InventoryHoldLine> Lines => _lines.AsReadOnly();
 
     private InventoryHold()
@@ -95,11 +111,20 @@ public sealed class InventoryHold : AggregateRoot<InventoryHoldId>
             lines);
     }
 
+    /// <summary>
+    /// Determines whether the supplied explicit time has reached the expiration boundary.
+    /// </summary>
+    /// <param name="now">The time supplied by the application layer.</param>
+    /// <returns><see langword="true"/> at or after expiration; otherwise <see langword="false"/>.</returns>
     public bool IsExpiredAt(DateTimeOffset now)
     {
         return now >= ExpiresAt;
     }
 
+    /// <summary>
+    /// Releases a held claim before it expires.
+    /// </summary>
+    /// <param name="releasedAt">The explicit release timestamp.</param>
     public void Release(DateTimeOffset releasedAt)
     {
         EnsureHeld("Only held inventory holds can be released.");
@@ -114,6 +139,10 @@ public sealed class InventoryHold : AggregateRoot<InventoryHoldId>
         Status = InventoryHoldStatus.Released;
     }
 
+    /// <summary>
+    /// Confirms a held claim before it expires so inventory can become booked.
+    /// </summary>
+    /// <param name="confirmedAt">The explicit confirmation timestamp.</param>
     public void Confirm(DateTimeOffset confirmedAt)
     {
         EnsureHeld("Only held inventory holds can be confirmed.");
@@ -128,6 +157,10 @@ public sealed class InventoryHold : AggregateRoot<InventoryHoldId>
         Status = InventoryHoldStatus.Confirmed;
     }
 
+    /// <summary>
+    /// Marks a held claim as expired at or after its expiration boundary.
+    /// </summary>
+    /// <param name="expiredAt">The explicit expiration timestamp.</param>
     public void Expire(DateTimeOffset expiredAt)
     {
         EnsureHeld("Only held inventory holds can be expired.");

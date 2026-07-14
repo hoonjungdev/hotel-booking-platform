@@ -22,4 +22,7 @@ app.MapGet("/", () => Results.Ok(new
 
 app.Run();
 
+/// <summary>
+/// Exposes the generated API entry point to integration tests.
+/// </summary>
 public partial class Program;

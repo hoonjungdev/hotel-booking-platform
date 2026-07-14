@@ -2,8 +2,10 @@ using HotelBooking.SharedKernel.Exceptions;
 
 namespace HotelBooking.Modules.Property.Domain.RoomTypes.ValueObjects;
 
+/// <summary>Represents a normalized hotel-specific room type code.</summary>
 public sealed record RoomTypeCode
 {
+    /// <summary>Gets the trimmed uppercase code.</summary>
     public string Value { get; }
 
     private RoomTypeCode(string value)
@@ -11,6 +13,7 @@ public sealed record RoomTypeCode
         Value = value;
     }
 
+    /// <summary>Creates a normalized room type code no longer than 30 characters.</summary>
     public static RoomTypeCode Create(string code)
     {
         if (string.IsNullOrWhiteSpace(code))
@@ -28,5 +31,6 @@ public sealed record RoomTypeCode
         return new RoomTypeCode(trimmedCode.ToUpperInvariant());
     }
 
+    /// <inheritdoc />
     public override string ToString() => Value;
 }

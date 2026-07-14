@@ -4,11 +4,14 @@ namespace HotelBooking.UnitTests.SharedKernel.Domain;
 
 public class AggregateRootTests
 {
+    private static readonly DateTimeOffset OccurredAt =
+        new(2026, 7, 1, 10, 0, 0, TimeSpan.Zero);
+
     [Fact]
     public void RaiseDomainEvent_adds_event()
     {
         var aggregate = new TestAggregate(Guid.NewGuid());
-        var domainEvent = new TestDomainEvent(DateTimeOffset.UtcNow);
+        var domainEvent = new TestDomainEvent(OccurredAt);
 
         aggregate.Raise(domainEvent);
 
@@ -20,7 +23,7 @@ public class AggregateRootTests
     public void ClearDomainEvents_removes_all_events()
     {
         var aggregate = new TestAggregate(Guid.NewGuid());
-        aggregate.Raise(new TestDomainEvent(DateTimeOffset.UtcNow));
+        aggregate.Raise(new TestDomainEvent(OccurredAt));
 
         aggregate.ClearDomainEvents();
 

@@ -5,19 +5,31 @@ using HotelBooking.SharedKernel.Exceptions;
 
 namespace HotelBooking.Modules.Property.Domain.RoomTypes;
 
+/// <summary>
+/// Represents a guest-bookable category of rooms offered by one hotel.
+/// </summary>
 public sealed class RoomType : AggregateRoot<RoomTypeId>
 {
 
     private readonly List<BedComposition> _bedCompositions = [];
 
+    /// <summary>Gets the hotel that offers this room type.</summary>
     public HotelId HotelId { get; private set; }
+    /// <summary>Gets the guest-facing room type name.</summary>
     public string Name { get; private set; } = null!;
+    /// <summary>Gets the hotel-specific room type code.</summary>
     public RoomTypeCode Code { get; private set; } = null!;
+    /// <summary>Gets the room type lifecycle status.</summary>
     public RoomTypeStatus Status { get; private set; }
+    /// <summary>Gets the supported guest occupancy.</summary>
     public Occupancy Occupancy { get; private set; } = null!;
+    /// <summary>Gets the explicit creation timestamp.</summary>
     public DateTimeOffset CreatedAt { get; private set; }
+    /// <summary>Gets the latest update timestamp when later editing is introduced.</summary>
     public DateTimeOffset? UpdatedAt { get; private set; }
+    /// <summary>Gets the bed configuration offered by this room type.</summary>
     public IReadOnlyList<BedComposition> BedCompositions => _bedCompositions.AsReadOnly();
+    /// <summary>Gets whether the room type is currently available for sale.</summary>
     public bool IsSellable => Status == RoomTypeStatus.Active;
 
     private RoomType()
@@ -44,6 +56,7 @@ public sealed class RoomType : AggregateRoot<RoomTypeId>
         CreatedAt = createdAt;
     }
 
+    /// <summary>Creates a draft room type that is not yet sellable.</summary>
     public static RoomType CreateDraft(
         RoomTypeId id,
         HotelId hotelId,
@@ -109,6 +122,7 @@ public sealed class RoomType : AggregateRoot<RoomTypeId>
             createdAt);
     }
 
+    /// <summary>Activates a fully configured draft room type for sale.</summary>
     public void Activate()
     {
         if (Status != RoomTypeStatus.Draft)
@@ -119,6 +133,7 @@ public sealed class RoomType : AggregateRoot<RoomTypeId>
         Status = RoomTypeStatus.Active;
     }
 
+    /// <summary>Temporarily removes an active room type from sale.</summary>
     public void Suspend()
     {
         if (Status != RoomTypeStatus.Active)
@@ -129,6 +144,7 @@ public sealed class RoomType : AggregateRoot<RoomTypeId>
         Status = RoomTypeStatus.Suspended;
     }
 
+    /// <summary>Permanently closes the room type; repeated closure is idempotent.</summary>
     public void Close()
     {
         if (Status == RoomTypeStatus.Closed)
@@ -139,6 +155,7 @@ public sealed class RoomType : AggregateRoot<RoomTypeId>
         Status = RoomTypeStatus.Closed;
     }
 
+    /// <summary>Returns a suspended room type to active sale.</summary>
     public void Reactivate()
     {
         if (Status != RoomTypeStatus.Suspended)
@@ -149,6 +166,7 @@ public sealed class RoomType : AggregateRoot<RoomTypeId>
         Status = RoomTypeStatus.Active;
     }
 
+    /// <summary>Determines whether an adult and child guest composition fits this room type.</summary>
     public bool CanAccommodate(int adults, int children)
     {
         return Occupancy.CanAccommodate(adults, children);

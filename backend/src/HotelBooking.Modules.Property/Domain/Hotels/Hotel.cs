@@ -5,28 +5,45 @@ using HotelBooking.SharedKernel.Exceptions;
 
 namespace HotelBooking.Modules.Property.Domain.Hotels;
 
+/// <summary>
+/// Represents a hotel and governs the information and lifecycle required before it can be published.
+/// </summary>
 public sealed class Hotel : AggregateRoot<HotelId>
 {
+    /// <summary>Gets the guest-facing hotel name.</summary>
     public string Name { get; private set; } = null!;
 
+    /// <summary>Gets the normalized URL slug.</summary>
     public string Slug { get; private set; } = null!;
 
+    /// <summary>Gets the hotel's operational lifecycle status.</summary>
     public HotelStatus Status { get; private set; }
 
+    /// <summary>Gets the optional official star rating.</summary>
     public StarRating? StarRating { get; private set; }
 
+    /// <summary>Gets the hotel's postal address.</summary>
     public Address? Address { get; private set; }
+    /// <summary>Gets the optional geographic coordinates.</summary>
     public GeoLocation? GeoLocation { get; private set; }
+    /// <summary>Gets the hotel's guest contact information.</summary>
     public ContactInfo? ContactInfo { get; private set; }
 
+    /// <summary>Gets the IANA time-zone identifier used for hotel-local operations.</summary>
     public string TimeZoneId { get; private set; } = null!;
+    /// <summary>Gets the ISO 4217 default currency code.</summary>
     public string DefaultCurrency { get; private set; } = null!;
+    /// <summary>Gets the default language used by the hotel.</summary>
     public string DefaultLanguage { get; private set; } = null!;
 
+    /// <summary>Gets the hotel's check-in and check-out policy.</summary>
     public CheckInPolicy? CheckInPolicy { get; private set; }
+    /// <summary>Gets the hotel's guest and deposit policy.</summary>
     public HotelPolicy? HotelPolicy { get; private set; }
 
+    /// <summary>Gets the explicit creation timestamp.</summary>
     public DateTimeOffset CreatedAt { get; private set; }
+    /// <summary>Gets the timestamp of the latest information update or publication.</summary>
     public DateTimeOffset? UpdatedAt { get; private set; }
 
     private Hotel()
@@ -56,6 +73,9 @@ public sealed class Hotel : AggregateRoot<HotelId>
         CreatedAt = createdAt;
     }
 
+    /// <summary>
+    /// Creates a draft hotel that can be enriched before review and publication.
+    /// </summary>
     public static Hotel CreateDraft(
         HotelId id,
         string name,
@@ -85,6 +105,9 @@ public sealed class Hotel : AggregateRoot<HotelId>
             createdAt);
     }
 
+    /// <summary>
+    /// Submits a complete draft hotel for review before publication.
+    /// </summary>
     public void SubmitForReview()
     {
         if (Status != HotelStatus.Draft)
@@ -97,6 +120,10 @@ public sealed class Hotel : AggregateRoot<HotelId>
         Status = HotelStatus.PendingReview;
     }
 
+    /// <summary>
+    /// Publishes an approved hotel and records the publication domain event.
+    /// </summary>
+    /// <param name="publishedAt">The explicit timestamp supplied by the application layer.</param>
     public void Publish(DateTimeOffset publishedAt)
     {
         if (Status != HotelStatus.PendingReview)
@@ -112,6 +139,9 @@ public sealed class Hotel : AggregateRoot<HotelId>
         RaiseDomainEvent(new HotelPublishedDomainEvent(Id, publishedAt));
     }
 
+    /// <summary>
+    /// Suspends an active hotel so it is no longer operationally available.
+    /// </summary>
     public void Suspend()
     {
         if (Status != HotelStatus.Active)
@@ -122,6 +152,9 @@ public sealed class Hotel : AggregateRoot<HotelId>
         Status = HotelStatus.Suspended;
     }
 
+    /// <summary>
+    /// Returns a suspended hotel to active operation.
+    /// </summary>
     public void Reactivate()
     {
         if (Status != HotelStatus.Suspended)
@@ -132,6 +165,9 @@ public sealed class Hotel : AggregateRoot<HotelId>
         Status = HotelStatus.Active;
     }
 
+    /// <summary>
+    /// Permanently closes the hotel; repeated closure is idempotent.
+    /// </summary>
     public void Close()
     {
         if (Status == HotelStatus.Closed)
@@ -142,10 +178,14 @@ public sealed class Hotel : AggregateRoot<HotelId>
         Status = HotelStatus.Closed;
     }
 
+    /// <summary>
+    /// Updates the editable guest-facing identity of a non-closed hotel.
+    /// </summary>
     public void UpdateBasicInfo(
         string name,
         string slug,
-        StarRating? starRating)
+        StarRating? starRating,
+        DateTimeOffset updatedAt)
     {
         EnsureEditable();
 
@@ -156,46 +196,59 @@ public sealed class Hotel : AggregateRoot<HotelId>
         Slug = normalizedSlug;
         StarRating = starRating;
 
-        Touch();
+        Touch(updatedAt);
     }
 
+    /// <summary>
+    /// Updates the address and optional coordinates of a non-closed hotel.
+    /// </summary>
     public void UpdateLocation(
         Address address,
-        GeoLocation? geoLocation)
+        GeoLocation? geoLocation,
+        DateTimeOffset updatedAt)
     {
         EnsureEditable();
 
         Address = address;
         GeoLocation = geoLocation;
 
-        Touch();
+        Touch(updatedAt);
     }
 
-    public void UpdateContactInfo(ContactInfo contactInfo)
+    /// <summary>
+    /// Updates the guest contact information of a non-closed hotel.
+    /// </summary>
+    public void UpdateContactInfo(ContactInfo contactInfo, DateTimeOffset updatedAt)
     {
         EnsureEditable();
 
         ContactInfo = contactInfo;
 
-        Touch();
+        Touch(updatedAt);
     }
 
-    public void UpdateCheckInPolicy(CheckInPolicy checkInPolicy)
+    /// <summary>
+    /// Updates check-in and check-out rules for a non-closed hotel.
+    /// </summary>
+    public void UpdateCheckInPolicy(CheckInPolicy checkInPolicy, DateTimeOffset updatedAt)
     {
         EnsureEditable();
 
         CheckInPolicy = checkInPolicy;
 
-        Touch();
+        Touch(updatedAt);
     }
 
-    public void UpdateHotelPolicy(HotelPolicy hotelPolicy)
+    /// <summary>
+    /// Updates guest eligibility and deposit rules for a non-closed hotel.
+    /// </summary>
+    public void UpdateHotelPolicy(HotelPolicy hotelPolicy, DateTimeOffset updatedAt)
     {
         EnsureEditable();
 
         HotelPolicy = hotelPolicy;
 
-        Touch();
+        Touch(updatedAt);
     }
 
     private void EnsureEditable()
@@ -206,9 +259,9 @@ public sealed class Hotel : AggregateRoot<HotelId>
         }
     }
 
-    private void Touch()
+    private void Touch(DateTimeOffset updatedAt)
     {
-        UpdatedAt = DateTimeOffset.UtcNow;
+        UpdatedAt = updatedAt;
     }
 
     private void ValidatePublished()

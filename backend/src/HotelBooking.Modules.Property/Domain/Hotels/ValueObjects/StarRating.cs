@@ -1,7 +1,9 @@
 namespace HotelBooking.Modules.Property.Domain.Hotels.ValueObjects;
 
+/// <summary>Represents an official hotel star rating from one through five.</summary>
 public sealed record StarRating
 {
+    /// <summary>Gets the numeric star rating.</summary>
     public int Value { get; }
 
     private StarRating(int value)
@@ -9,6 +11,7 @@ public sealed record StarRating
         Value = value;
     }
 
+    /// <summary>Creates a valid one-to-five star hotel rating.</summary>
     public static StarRating Create(int value)
     {
         if (value is < 1 or > 5)
@@ -21,6 +24,7 @@ public sealed record StarRating
         return new StarRating(value);
     }
 
+    /// <inheritdoc />
     public override string ToString()
     {
         return $"{Value}-star";

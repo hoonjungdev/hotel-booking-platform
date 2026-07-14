@@ -311,7 +311,8 @@ public class RoomTypeTests
 
     private static RoomType CreateRoomTypeWithStatus(RoomTypeStatus status)
     {
-        return status switch {
+        return status switch
+        {
             RoomTypeStatus.Draft => CreateDraftRoomType(),
             RoomTypeStatus.Active => CreateActiveRoomType(),
             RoomTypeStatus.Suspended => CreateSuspendedRoomType(),

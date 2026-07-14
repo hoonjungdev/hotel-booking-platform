@@ -3,9 +3,14 @@ using HotelBooking.SharedKernel.Exceptions;
 
 namespace HotelBooking.Modules.Inventory.Domain.InventoryHolds;
 
+/// <summary>
+/// Records the quantity claimed by an inventory hold on one occupied date.
+/// </summary>
 public sealed class InventoryHoldLine : Entity<InventoryHoldLineId>
 {
+    /// <summary>Gets the inventory-consuming date.</summary>
     public DateOnly OccupiedDate { get; private set; }
+    /// <summary>Gets the quantity claimed on the occupied date.</summary>
     public int Quantity { get; private set; }
 
     private InventoryHoldLine()
@@ -23,6 +28,9 @@ public sealed class InventoryHoldLine : Entity<InventoryHoldLineId>
         Quantity = quantity;
     }
 
+    /// <summary>
+    /// Creates a line for a positive quantity on one occupied date.
+    /// </summary>
     public static InventoryHoldLine Create(
         InventoryHoldLineId id,
         DateOnly occupiedDate,

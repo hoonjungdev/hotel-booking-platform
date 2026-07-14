@@ -2,10 +2,14 @@ using HotelBooking.SharedKernel.Exceptions;
 
 namespace HotelBooking.Modules.Property.Domain.RoomTypes.ValueObjects;
 
+/// <summary>Defines the adult, child, and combined guest limits of a room type.</summary>
 public sealed record Occupancy
 {
+    /// <summary>Gets the maximum adult guest count.</summary>
     public int MaxAdults { get; }
+    /// <summary>Gets the maximum child guest count.</summary>
     public int MaxChildren { get; }
+    /// <summary>Gets the maximum combined guest count.</summary>
     public int MaxOccupancy { get; }
 
     private Occupancy(int maxAdults, int maxChildren, int maxOccupancy)
@@ -15,6 +19,7 @@ public sealed record Occupancy
         MaxOccupancy = maxOccupancy;
     }
 
+    /// <summary>Creates internally consistent room type occupancy limits.</summary>
     public static Occupancy Create(int maxAdults, int maxChildren, int maxOccupancy)
     {
         if (maxAdults < 1)
@@ -45,6 +50,7 @@ public sealed record Occupancy
         return new Occupancy(maxAdults, maxChildren, maxOccupancy);
     }
 
+    /// <summary>Determines whether the requested guest composition fits all configured limits.</summary>
     public bool CanAccommodate(int adults, int children)
     {
         return adults <= MaxAdults

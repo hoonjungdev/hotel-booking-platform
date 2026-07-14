@@ -7,6 +7,9 @@ namespace HotelBooking.UnitTests.Property.Hotels;
 
 public class HotelTests
 {
+    private static readonly DateTimeOffset UpdatedAt =
+        new(2026, 7, 1, 11, 0, 0, TimeSpan.Zero);
+
     [Fact]
     public void CreateDraft_creates_hotel_in_draft_status()
     {
@@ -173,21 +176,21 @@ public class HotelTests
         hotel.UpdateContactInfo(new ContactInfo(
             Phone: "010-1234-5678",
             Email: null,
-            Website: null));
+            Website: null), UpdatedAt);
 
         hotel.UpdateCheckInPolicy(new CheckInPolicy(
             CheckInFrom: new TimeOnly(15, 0, 0),
             CheckInUntil: new TimeOnly(23, 0, 0),
             CheckOutUntil: new TimeOnly(11, 0, 0),
             AllowsEarlyCheckIn: true,
-            AllowsLateCheckOut: true));
+            AllowsLateCheckOut: true), UpdatedAt);
 
         hotel.UpdateHotelPolicy(new HotelPolicy(
             AllowsSmoking: false,
             AllowsPets: true,
             AllowsChildren: true,
             MinimumCheckInAge: 18,
-            RequiresDeposit: false));
+            RequiresDeposit: false), UpdatedAt);
 
         Assert.Throws<DomainArgumentException>(hotel.SubmitForReview);
 
@@ -207,21 +210,22 @@ public class HotelTests
                 Region: "Seoul",
                 StreetAddress: "LeeSunsin",
                 DetailAddress: null),
-            geoLocation: null);
+            geoLocation: null,
+            updatedAt: UpdatedAt);
 
         hotel.UpdateCheckInPolicy(new CheckInPolicy(
             CheckInFrom: new TimeOnly(15, 0, 0),
             CheckInUntil: new TimeOnly(23, 0, 0),
             CheckOutUntil: new TimeOnly(11, 0, 0),
             AllowsEarlyCheckIn: true,
-            AllowsLateCheckOut: true));
+            AllowsLateCheckOut: true), UpdatedAt);
 
         hotel.UpdateHotelPolicy(new HotelPolicy(
             AllowsSmoking: false,
             AllowsPets: true,
             AllowsChildren: true,
             MinimumCheckInAge: 18,
-            RequiresDeposit: false));
+            RequiresDeposit: false), UpdatedAt);
 
         Assert.Throws<DomainArgumentException>(hotel.SubmitForReview);
 
@@ -241,19 +245,20 @@ public class HotelTests
                 Region: "Seoul",
                 StreetAddress: "LeeSunsin",
                 DetailAddress: null),
-            geoLocation: null);
+            geoLocation: null,
+            updatedAt: UpdatedAt);
 
         hotel.UpdateContactInfo(new ContactInfo(
             Phone: "010-1234-5678",
             Email: null,
-            Website: null));
+            Website: null), UpdatedAt);
 
         hotel.UpdateHotelPolicy(new HotelPolicy(
             AllowsSmoking: false,
             AllowsPets: true,
             AllowsChildren: true,
             MinimumCheckInAge: 18,
-            RequiresDeposit: false));
+            RequiresDeposit: false), UpdatedAt);
 
         Assert.Throws<DomainArgumentException>(hotel.SubmitForReview);
 
@@ -273,19 +278,20 @@ public class HotelTests
                 Region: "Seoul",
                 StreetAddress: "LeeSunsin",
                 DetailAddress: null),
-            geoLocation: null);
+            geoLocation: null,
+            updatedAt: UpdatedAt);
 
         hotel.UpdateContactInfo(new ContactInfo(
             Phone: "010-1234-5678",
             Email: null,
-            Website: null));
+            Website: null), UpdatedAt);
 
         hotel.UpdateCheckInPolicy(new CheckInPolicy(
             CheckInFrom: new TimeOnly(15, 0, 0),
             CheckInUntil: new TimeOnly(23, 0, 0),
             CheckOutUntil: new TimeOnly(11, 0, 0),
             AllowsEarlyCheckIn: true,
-            AllowsLateCheckOut: true));
+            AllowsLateCheckOut: true), UpdatedAt);
 
         Assert.Throws<DomainArgumentException>(hotel.SubmitForReview);
 
@@ -297,7 +303,7 @@ public class HotelTests
     {
         Hotel hotel = CreateDraftHotel();
 
-        Assert.Throws<DomainException>(() => hotel.Publish(DateTimeOffset.UtcNow));
+        Assert.Throws<DomainException>(() => hotel.Publish(UpdatedAt));
     }
 
     [Fact]
@@ -307,7 +313,7 @@ public class HotelTests
 
         hotel.SubmitForReview();
 
-        hotel.Publish(DateTimeOffset.UtcNow);
+        hotel.Publish(UpdatedAt);
 
         Assert.Equal(HotelStatus.Active, hotel.Status);
     }
@@ -350,7 +356,7 @@ public class HotelTests
 
         hotel.SubmitForReview();
 
-        hotel.Publish(DateTimeOffset.UtcNow);
+        hotel.Publish(UpdatedAt);
 
         hotel.Suspend();
 
@@ -372,7 +378,7 @@ public class HotelTests
 
         hotel.SubmitForReview();
 
-        hotel.Publish(DateTimeOffset.UtcNow);
+        hotel.Publish(UpdatedAt);
 
         hotel.Close();
 
@@ -386,7 +392,7 @@ public class HotelTests
 
         hotel.SubmitForReview();
 
-        hotel.Publish(DateTimeOffset.UtcNow);
+        hotel.Publish(UpdatedAt);
 
         hotel.Close();
 
@@ -394,7 +400,25 @@ public class HotelTests
             () => hotel.UpdateBasicInfo(
                 name: "New Hoon Hotel",
                 slug: "new-hoon-hotel",
-                null));
+                starRating: null,
+                updatedAt: UpdatedAt));
+    }
+
+    [Fact]
+    public void UpdateBasicInfo_records_the_explicit_update_timestamp()
+    {
+        Hotel hotel = CreateDraftHotel();
+
+        hotel.UpdateBasicInfo(
+            name: "New Hoon Hotel",
+            slug: "new-hoon-hotel",
+            starRating: StarRating.Create(5),
+            updatedAt: UpdatedAt);
+
+        Assert.Equal("New Hoon Hotel", hotel.Name);
+        Assert.Equal("new-hoon-hotel", hotel.Slug);
+        Assert.Equal(StarRating.Create(5), hotel.StarRating);
+        Assert.Equal(UpdatedAt, hotel.UpdatedAt);
     }
 
     [Fact]
@@ -404,7 +428,7 @@ public class HotelTests
 
         hotel.SubmitForReview();
 
-        hotel.Publish(DateTimeOffset.UtcNow);
+        hotel.Publish(UpdatedAt);
 
         hotel.Suspend();
 
@@ -448,19 +472,19 @@ public class HotelTests
             CheckInUntil: new TimeOnly(23, 0, 0),
             CheckOutUntil: new TimeOnly(11, 0, 0),
             AllowsEarlyCheckIn: true,
-            AllowsLateCheckOut: true));
+            AllowsLateCheckOut: true), UpdatedAt);
 
         hotel.UpdateContactInfo(new ContactInfo(
             Phone: "010-1234-5678",
             Email: null,
-            Website: null));
+            Website: null), UpdatedAt);
 
         hotel.UpdateHotelPolicy(new HotelPolicy(
             AllowsSmoking: false,
             AllowsPets: true,
             AllowsChildren: true,
             MinimumCheckInAge: 18,
-            RequiresDeposit: false));
+            RequiresDeposit: false), UpdatedAt);
 
         hotel.UpdateLocation(
             address: new Address(
@@ -470,7 +494,8 @@ public class HotelTests
                 Region: "Seoul",
                 StreetAddress: "LeeSunsin",
                 DetailAddress: null),
-            geoLocation: null);
+            geoLocation: null,
+            updatedAt: UpdatedAt);
 
         return hotel;
     }

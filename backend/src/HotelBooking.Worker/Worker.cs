@@ -1,7 +1,12 @@
 namespace HotelBooking.Worker;
 
+/// <summary>
+/// Hosts background processing until module-specific workers are introduced.
+/// </summary>
+/// <param name="logger">The worker logger.</param>
 public class Worker(ILogger<Worker> logger) : BackgroundService
 {
+    /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         logger.LogInformation("Hotel Booking worker started.");

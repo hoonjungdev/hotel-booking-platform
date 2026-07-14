@@ -9,14 +9,20 @@ using OpenTelemetry.Trace;
 
 namespace Microsoft.Extensions.Hosting;
 
-// Adds common Aspire services: service discovery, resilience, health checks, and OpenTelemetry.
-// This project should be referenced by each service project in your solution.
-// To learn more about using this project, see https://aka.ms/aspire/service-defaults
+/// <summary>
+/// Configures shared observability, resilience, service discovery, and health endpoints.
+/// </summary>
 public static class Extensions
 {
     private const string HealthEndpointPath = "/health";
     private const string AlivenessEndpointPath = "/alive";
 
+    /// <summary>
+    /// Adds the platform-wide service defaults to an application host.
+    /// </summary>
+    /// <typeparam name="TBuilder">The host builder type.</typeparam>
+    /// <param name="builder">The application host builder.</param>
+    /// <returns>The same builder for further configuration.</returns>
     public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
         builder.ConfigureOpenTelemetry();
@@ -43,6 +49,12 @@ public static class Extensions
         return builder;
     }
 
+    /// <summary>
+    /// Configures shared logging, metrics, and tracing instrumentation.
+    /// </summary>
+    /// <typeparam name="TBuilder">The host builder type.</typeparam>
+    /// <param name="builder">The application host builder.</param>
+    /// <returns>The same builder for further configuration.</returns>
     public static TBuilder ConfigureOpenTelemetry<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
         builder.Logging.AddOpenTelemetry(logging =>
@@ -96,6 +108,12 @@ public static class Extensions
         return builder;
     }
 
+    /// <summary>
+    /// Adds the default liveness health check.
+    /// </summary>
+    /// <typeparam name="TBuilder">The host builder type.</typeparam>
+    /// <param name="builder">The application host builder.</param>
+    /// <returns>The same builder for further configuration.</returns>
     public static TBuilder AddDefaultHealthChecks<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
     {
         builder.Services.AddHealthChecks()
@@ -105,6 +123,11 @@ public static class Extensions
         return builder;
     }
 
+    /// <summary>
+    /// Maps health endpoints used by development tooling and orchestration.
+    /// </summary>
+    /// <param name="app">The web application.</param>
+    /// <returns>The same application for further endpoint mapping.</returns>
     public static WebApplication MapDefaultEndpoints(this WebApplication app)
     {
         // Adding health checks endpoints to applications in non-development environments has security implications.
