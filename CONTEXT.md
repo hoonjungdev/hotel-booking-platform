@@ -100,6 +100,14 @@ _Avoid_: Payment capture when capture is not part of the booking flow
 A simulated reversal related to a payment after cancellation or another permitted scenario.
 _Avoid_: Chargeback
 
+**Currency**:
+The denomination used for a hotel price or payment amount, identified by a canonical three-letter currency code.
+_Avoid_: Currency symbol when identifying the denomination
+
+**Money**:
+A non-negative amount denominated in exactly one currency. Amounts in different currencies are not interchangeable or combinable.
+_Avoid_: Bare decimal amount, price without currency
+
 **Cancellation Policy**:
 A penalty schedule attached to a rate plan that defines the charge for cancelling a confirmed reservation before check-in. A policy may apply different penalties to different advance-notice periods.
 _Avoid_: Refund policy
