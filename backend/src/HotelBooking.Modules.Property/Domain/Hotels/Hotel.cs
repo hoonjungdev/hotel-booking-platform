@@ -2,6 +2,7 @@ using HotelBooking.Modules.Property.Domain.Hotels.Events;
 using HotelBooking.Modules.Property.Domain.Hotels.ValueObjects;
 using HotelBooking.SharedKernel.Domain;
 using HotelBooking.SharedKernel.Exceptions;
+using HotelBooking.SharedKernel.ValueObjects;
 
 namespace HotelBooking.Modules.Property.Domain.Hotels;
 
@@ -31,8 +32,8 @@ public sealed class Hotel : AggregateRoot<HotelId>
 
     /// <summary>Gets the IANA time-zone identifier used for hotel-local operations.</summary>
     public string TimeZoneId { get; private set; } = null!;
-    /// <summary>Gets the ISO 4217 default currency code.</summary>
-    public string DefaultCurrency { get; private set; } = null!;
+    /// <summary>Gets the single currency in which the hotel sells stays.</summary>
+    public Currency SellingCurrency { get; private set; } = null!;
     /// <summary>Gets the default language used by the hotel.</summary>
     public string DefaultLanguage { get; private set; } = null!;
 
@@ -58,7 +59,7 @@ public sealed class Hotel : AggregateRoot<HotelId>
         HotelStatus status,
         StarRating? starRating,
         string timeZoneId,
-        string defaultCurrency,
+        Currency sellingCurrency,
         string defaultLanguage,
         DateTimeOffset createdAt)
     {
@@ -68,7 +69,7 @@ public sealed class Hotel : AggregateRoot<HotelId>
         Status = status;
         StarRating = starRating;
         TimeZoneId = timeZoneId;
-        DefaultCurrency = defaultCurrency;
+        SellingCurrency = sellingCurrency;
         DefaultLanguage = defaultLanguage;
         CreatedAt = createdAt;
     }
@@ -76,13 +77,25 @@ public sealed class Hotel : AggregateRoot<HotelId>
     /// <summary>
     /// Creates a draft hotel that can be enriched before review and publication.
     /// </summary>
+    /// <param name="id">The Property-owned Hotel identifier.</param>
+    /// <param name="name">The required guest-facing hotel name.</param>
+    /// <param name="slug">The required URL slug.</param>
+    /// <param name="starRating">The optional official star rating.</param>
+    /// <param name="timeZoneId">The required IANA time-zone identifier.</param>
+    /// <param name="sellingCurrency">The currency in which the hotel sells stays.</param>
+    /// <param name="defaultLanguage">The hotel's required default language.</param>
+    /// <param name="createdAt">The explicit creation timestamp.</param>
+    /// <returns>A draft hotel with its immutable selling currency.</returns>
+    /// <exception cref="DomainArgumentException">
+    /// Thrown when a required identifier or hotel attribute is missing or invalid.
+    /// </exception>
     public static Hotel CreateDraft(
         HotelId id,
         string name,
         string slug,
         StarRating? starRating,
         string timeZoneId,
-        string defaultCurrency,
+        Currency sellingCurrency,
         string defaultLanguage,
         DateTimeOffset createdAt)
     {
@@ -90,7 +103,7 @@ public sealed class Hotel : AggregateRoot<HotelId>
         string normalizedName = ValidateName(name);
         string normalizedSlug = ValidateSlug(slug);
         ValidateTimeZoneId(timeZoneId);
-        string normalizedDefaultCurrency = ValidateCurrency(defaultCurrency);
+        ValidateSellingCurrency(sellingCurrency);
         ValidateLanguage(defaultLanguage);
 
         return new Hotel(
@@ -100,7 +113,7 @@ public sealed class Hotel : AggregateRoot<HotelId>
             HotelStatus.Draft,
             starRating,
             timeZoneId,
-            normalizedDefaultCurrency,
+            sellingCurrency,
             defaultLanguage,
             createdAt);
     }
@@ -337,21 +350,21 @@ public sealed class Hotel : AggregateRoot<HotelId>
         }
     }
 
-    private static string ValidateCurrency(string currency)
+    /// <summary>
+    /// Ensures every Hotel is created with the currency in which it sells stays.
+    /// </summary>
+    /// <param name="sellingCurrency">The Hotel Selling Currency being assigned.</param>
+    /// <exception cref="DomainArgumentException">
+    /// Thrown when the selling currency is missing.
+    /// </exception>
+    private static void ValidateSellingCurrency(Currency sellingCurrency)
     {
-        if (string.IsNullOrWhiteSpace(currency))
+        if (sellingCurrency is null)
         {
-            throw new DomainArgumentException("Default currency is required", nameof(currency));
+            throw new DomainArgumentException(
+                "Hotel selling currency is required.",
+                nameof(sellingCurrency));
         }
-
-        string normalizedCurrency = currency.Trim().ToUpperInvariant();
-
-        if (normalizedCurrency.Length != 3)
-        {
-            throw new DomainArgumentException("Default currency must be an ISO 4217 currency code.", nameof(currency));
-        }
-
-        return normalizedCurrency;
     }
 
     private static void ValidateLanguage(string language)

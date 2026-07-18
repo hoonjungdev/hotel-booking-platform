@@ -5,6 +5,7 @@ using HotelBooking.Modules.Inventory;
 using HotelBooking.Modules.Notification;
 using HotelBooking.Modules.Payment;
 using HotelBooking.Modules.Pricing;
+using HotelBooking.Modules.Pricing.Domain.References;
 using HotelBooking.Modules.Property;
 
 namespace HotelBooking.ArchitectureTests;
@@ -67,6 +68,16 @@ public class ModuleBoundaryTests
                     string.Join(", ", forbiddenDependencies));
             }
         }
+    }
+
+    [Fact]
+    public void Hotel_rate_settings_cannot_be_created_outside_pricing()
+    {
+        MethodInfo? publicFactory = typeof(HotelRateSettings).GetMethod(
+            "Create",
+            BindingFlags.Public | BindingFlags.Static);
+
+        Assert.Null(publicFactory);
     }
 
     [Fact]

@@ -104,6 +104,10 @@ _Avoid_: Chargeback
 The denomination used for a hotel price or payment amount, identified by a canonical three-letter currency code.
 _Avoid_: Currency symbol when identifying the denomination
 
+**Hotel Selling Currency**:
+The single currency in which a hotel publishes rates, agrees reservation prices, and accepts payments.
+_Avoid_: Default currency when the hotel does not support multiple selling currencies
+
 **Money**:
 A non-negative amount denominated in exactly one currency. Amounts in different currencies are not interchangeable or combinable.
 _Avoid_: Bare decimal amount, price without currency

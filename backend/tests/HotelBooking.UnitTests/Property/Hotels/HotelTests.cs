@@ -2,6 +2,7 @@ using HotelBooking.Modules.Property.Domain.Hotels;
 using HotelBooking.Modules.Property.Domain.Hotels.Events;
 using HotelBooking.Modules.Property.Domain.Hotels.ValueObjects;
 using HotelBooking.SharedKernel.Exceptions;
+using HotelBooking.SharedKernel.ValueObjects;
 
 namespace HotelBooking.UnitTests.Property.Hotels;
 
@@ -22,7 +23,7 @@ public class HotelTests
             slug: "   Hoon-Hotel",
             starRating: StarRating.Create(4),
             timeZoneId: "Asia/Seoul",
-            defaultCurrency: " krw",
+            sellingCurrency: Currency.FromCode("krw"),
             defaultLanguage: "ko",
             createdAt: createdAt);
 
@@ -32,7 +33,7 @@ public class HotelTests
         Assert.Equal(HotelStatus.Draft, hotel.Status);
         Assert.Equal(StarRating.Create(4), hotel.StarRating);
         Assert.Equal("Asia/Seoul", hotel.TimeZoneId);
-        Assert.Equal("KRW", hotel.DefaultCurrency);
+        Assert.Equal(Currency.FromCode("KRW"), hotel.SellingCurrency);
         Assert.Equal("ko", hotel.DefaultLanguage);
         Assert.Equal(createdAt, hotel.CreatedAt);
     }
@@ -55,7 +56,7 @@ public class HotelTests
             slug: "   Hoon-Hotel",
             starRating: StarRating.Create(4),
             timeZoneId: "Asia/Seoul",
-            defaultCurrency: " krw",
+            sellingCurrency: Currency.FromCode("krw"),
             defaultLanguage: "ko",
             createdAt: new DateTimeOffset(2026, 7, 1, 10, 0, 0, TimeSpan.Zero)));
     }
@@ -69,7 +70,7 @@ public class HotelTests
             slug: "   Hoon-Hotel",
             starRating: StarRating.Create(4),
             timeZoneId: "Asia/Seoul",
-            defaultCurrency: " krw",
+            sellingCurrency: Currency.FromCode("krw"),
             defaultLanguage: "ko",
             createdAt: new DateTimeOffset(2026, 7, 1, 10, 0, 0, TimeSpan.Zero)));
     }
@@ -83,7 +84,7 @@ public class HotelTests
             slug: "",
             starRating: StarRating.Create(4),
             timeZoneId: "Asia/Seoul",
-            defaultCurrency: " krw",
+            sellingCurrency: Currency.FromCode("krw"),
             defaultLanguage: "ko",
             createdAt: new DateTimeOffset(2026, 7, 1, 10, 0, 0, TimeSpan.Zero)));
     }
@@ -97,37 +98,25 @@ public class HotelTests
             slug: new string('a', 201),
             starRating: StarRating.Create(4),
             timeZoneId: "Asia/Seoul",
-            defaultCurrency: " krw",
+            sellingCurrency: Currency.FromCode("krw"),
             defaultLanguage: "ko",
             createdAt: new DateTimeOffset(2026, 7, 1, 10, 0, 0, TimeSpan.Zero)));
     }
 
     [Fact]
-    public void CreateDraft_throws_when_default_currency_is_empty()
+    public void CreateDraft_rejects_missing_selling_currency()
     {
-        Assert.Throws<DomainArgumentException>(() => Hotel.CreateDraft(
+        DomainArgumentException exception = Assert.Throws<DomainArgumentException>(() => Hotel.CreateDraft(
             id: HotelId.Create(),
             name: " Hoon Hotel ",
             slug: "   Hoon-Hotel",
             starRating: StarRating.Create(4),
             timeZoneId: "Asia/Seoul",
-            defaultCurrency: "",
+            sellingCurrency: null!,
             defaultLanguage: "ko",
             createdAt: new DateTimeOffset(2026, 7, 1, 10, 0, 0, TimeSpan.Zero)));
-    }
 
-    [Fact]
-    public void CreateDraft_throws_when_default_currency_not_3_characters()
-    {
-        Assert.Throws<DomainArgumentException>(() => Hotel.CreateDraft(
-            id: HotelId.Create(),
-            name: " Hoon Hotel ",
-            slug: "   Hoon-Hotel",
-            starRating: StarRating.Create(4),
-            timeZoneId: "Asia/Seoul",
-            defaultCurrency: " krwa",
-            defaultLanguage: "ko",
-            createdAt: new DateTimeOffset(2026, 7, 1, 10, 0, 0, TimeSpan.Zero)));
+        Assert.Equal("sellingCurrency", exception.ParamName);
     }
 
     [Fact]
@@ -139,7 +128,7 @@ public class HotelTests
             slug: "   Hoon-Hotel",
             starRating: StarRating.Create(4),
             timeZoneId: "",
-            defaultCurrency: " krw",
+            sellingCurrency: Currency.FromCode("krw"),
             defaultLanguage: "ko",
             createdAt: new DateTimeOffset(2026, 7, 1, 10, 0, 0, TimeSpan.Zero)));
     }
@@ -153,7 +142,7 @@ public class HotelTests
             slug: "   Hoon-Hotel",
             starRating: StarRating.Create(4),
             timeZoneId: "Asia/Seoul",
-            defaultCurrency: " krw",
+            sellingCurrency: Currency.FromCode("krw"),
             defaultLanguage: "",
             createdAt: new DateTimeOffset(2026, 7, 1, 10, 0, 0, TimeSpan.Zero)));
     }
@@ -458,7 +447,7 @@ public class HotelTests
             slug: "   Hoon-Hotel",
             starRating: StarRating.Create(4),
             timeZoneId: "Asia/Seoul",
-            defaultCurrency: " krw",
+            sellingCurrency: Currency.FromCode("krw"),
             defaultLanguage: "ko",
             createdAt: new DateTimeOffset(2026, 7, 1, 10, 0, 0, TimeSpan.Zero));
     }

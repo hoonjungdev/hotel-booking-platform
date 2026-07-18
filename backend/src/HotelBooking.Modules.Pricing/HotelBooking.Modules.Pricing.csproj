@@ -5,6 +5,10 @@
     <ProjectReference Include="..\HotelBooking.BuildingBlocks\HotelBooking.BuildingBlocks.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="HotelBooking.UnitTests" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>

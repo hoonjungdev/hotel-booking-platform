@@ -2,6 +2,7 @@ using HotelBooking.Modules.Pricing.Domain.RatePlans.ValueObjects;
 using HotelBooking.Modules.Pricing.Domain.References;
 using HotelBooking.SharedKernel.Domain;
 using HotelBooking.SharedKernel.Exceptions;
+using HotelBooking.SharedKernel.ValueObjects;
 
 namespace HotelBooking.Modules.Pricing.Domain.RatePlans;
 
@@ -10,11 +11,17 @@ namespace HotelBooking.Modules.Pricing.Domain.RatePlans;
 /// </summary>
 public sealed class RatePlan : AggregateRoot<RatePlanId>
 {
+    /// <summary>Gets the immutable hotel facts under which this rate plan was defined.</summary>
+    public HotelRateSettings HotelRateSettings { get; private set; } = null!;
+
     /// <summary>Gets the hotel that offers this rate plan.</summary>
-    public HotelId HotelId { get; private set; }
+    public HotelId HotelId => HotelRateSettings.HotelId;
 
     /// <summary>Gets the room type sold through this rate plan.</summary>
     public RoomTypeId RoomTypeId { get; private set; }
+
+    /// <summary>Gets the immutable currency in which this rate plan is sold.</summary>
+    public Currency SellingCurrency => HotelRateSettings.SellingCurrency;
 
     /// <summary>Gets the guest-facing rate plan name.</summary>
     public string Name { get; private set; } = null!;
@@ -35,14 +42,14 @@ public sealed class RatePlan : AggregateRoot<RatePlanId>
 
     private RatePlan(
         RatePlanId id,
-        HotelId hotelId,
+        HotelRateSettings hotelRateSettings,
         RoomTypeId roomTypeId,
         string name,
         RatePlanCode code,
         CancellationPolicy cancellationPolicy)
     {
         Id = id;
-        HotelId = hotelId;
+        HotelRateSettings = hotelRateSettings;
         RoomTypeId = roomTypeId;
         Name = name;
         Code = code;
@@ -52,18 +59,20 @@ public sealed class RatePlan : AggregateRoot<RatePlanId>
 
     /// <summary>Creates a draft rate plan for an existing hotel and room type.</summary>
     /// <param name="id">The Pricing-owned RatePlan identifier.</param>
-    /// <param name="hotelId">The existing hotel identifier owned by the Property module.</param>
+    /// <param name="hotelRateSettings">
+    /// The hotel identifier and selling currency obtained together at the Pricing boundary.
+    /// </param>
     /// <param name="roomTypeId">The existing room type identifier owned by the Property module.</param>
     /// <param name="name">The required guest-facing name.</param>
     /// <param name="code">The required hotel-defined operational code.</param>
     /// <param name="cancellationPolicy">The required cancellation penalty schedule.</param>
     /// <returns>A valid RatePlan in <see cref="RatePlanStatus.Draft"/> status.</returns>
     /// <exception cref="DomainArgumentException">
-    /// Thrown when an identifier, name, code, or cancellation policy is missing.
+    /// Thrown when an identifier, hotel rate settings, name, code, or cancellation policy is missing.
     /// </exception>
     public static RatePlan CreateDraft(
         RatePlanId id,
-        HotelId hotelId,
+        HotelRateSettings hotelRateSettings,
         RoomTypeId roomTypeId,
         string name,
         RatePlanCode code,
@@ -74,9 +83,11 @@ public sealed class RatePlan : AggregateRoot<RatePlanId>
             throw new DomainArgumentException("Rate plan ID is required.", nameof(id));
         }
 
-        if (hotelId == default)
+        if (hotelRateSettings is null)
         {
-            throw new DomainArgumentException("Hotel ID is required.", nameof(hotelId));
+            throw new DomainArgumentException(
+                "Hotel rate settings are required.",
+                nameof(hotelRateSettings));
         }
 
         if (roomTypeId == default)
@@ -105,7 +116,7 @@ public sealed class RatePlan : AggregateRoot<RatePlanId>
 
         return new RatePlan(
             id,
-            hotelId,
+            hotelRateSettings,
             roomTypeId,
             normalizedName,
             code,

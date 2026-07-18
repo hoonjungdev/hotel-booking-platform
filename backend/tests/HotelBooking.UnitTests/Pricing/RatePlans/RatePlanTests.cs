@@ -2,6 +2,7 @@ using HotelBooking.Modules.Pricing.Domain.RatePlans;
 using HotelBooking.Modules.Pricing.Domain.RatePlans.ValueObjects;
 using HotelBooking.Modules.Pricing.Domain.References;
 using HotelBooking.SharedKernel.Exceptions;
+using HotelBooking.SharedKernel.ValueObjects;
 
 namespace HotelBooking.UnitTests.Pricing.RatePlans;
 
@@ -19,6 +20,11 @@ public class RatePlanTests
     private static readonly RoomTypeId ExistingRoomTypeId =
         RoomTypeId.From(Guid.Parse("30000000-0000-0000-0000-000000000001"));
 
+    private static readonly Currency SellingCurrency = Currency.FromCode("KRW");
+
+    private static readonly HotelRateSettings ExistingHotelRateSettings =
+        HotelRateSettings.Create(ExistingHotelId, SellingCurrency);
+
     [Fact]
     public void CreateDraft_creates_rate_plan_in_draft_status()
     {
@@ -27,15 +33,17 @@ public class RatePlanTests
 
         RatePlan ratePlan = RatePlan.CreateDraft(
             ExistingRatePlanId,
-            ExistingHotelId,
+            ExistingHotelRateSettings,
             ExistingRoomTypeId,
             "  Flexible Breakfast Included  ",
             code,
             cancellationPolicy);
 
         Assert.Equal(ExistingRatePlanId, ratePlan.Id);
+        Assert.Equal(ExistingHotelRateSettings, ratePlan.HotelRateSettings);
         Assert.Equal(ExistingHotelId, ratePlan.HotelId);
         Assert.Equal(ExistingRoomTypeId, ratePlan.RoomTypeId);
+        Assert.Equal(SellingCurrency, ratePlan.SellingCurrency);
         Assert.Equal("Flexible Breakfast Included", ratePlan.Name);
         Assert.Equal(code, ratePlan.Code);
         Assert.Equal(cancellationPolicy, ratePlan.CancellationPolicy);
@@ -52,12 +60,18 @@ public class RatePlanTests
     }
 
     [Fact]
-    public void CreateDraft_rejects_default_hotel_id()
+    public void CreateDraft_rejects_missing_hotel_rate_settings()
     {
         DomainArgumentException exception = Assert.Throws<DomainArgumentException>(() =>
-            CreateDraftRatePlan(hotelId: new HotelId()));
+            RatePlan.CreateDraft(
+                ExistingRatePlanId,
+                null!,
+                ExistingRoomTypeId,
+                "Flexible Breakfast Included",
+                RatePlanCode.Create("FLEX-BB"),
+                CreateCancellationPolicy()));
 
-        Assert.Equal("hotelId", exception.ParamName);
+        Assert.Equal("hotelRateSettings", exception.ParamName);
     }
 
     [Fact]
@@ -87,7 +101,7 @@ public class RatePlanTests
         DomainArgumentException exception = Assert.Throws<DomainArgumentException>(() =>
             RatePlan.CreateDraft(
                 ExistingRatePlanId,
-                ExistingHotelId,
+                ExistingHotelRateSettings,
                 ExistingRoomTypeId,
                 "Flexible Breakfast Included",
                 null!,
@@ -102,7 +116,7 @@ public class RatePlanTests
         DomainArgumentException exception = Assert.Throws<DomainArgumentException>(() =>
             RatePlan.CreateDraft(
                 ExistingRatePlanId,
-                ExistingHotelId,
+                ExistingHotelRateSettings,
                 ExistingRoomTypeId,
                 "Flexible Breakfast Included",
                 RatePlanCode.Create("FLEX-BB"),
@@ -235,7 +249,6 @@ public class RatePlanTests
 
     private static RatePlan CreateDraftRatePlan(
         RatePlanId? id = null,
-        HotelId? hotelId = null,
         RoomTypeId? roomTypeId = null,
         string name = "Flexible Breakfast Included",
         RatePlanCode? code = null,
@@ -243,7 +256,7 @@ public class RatePlanTests
     {
         return RatePlan.CreateDraft(
             id ?? ExistingRatePlanId,
-            hotelId ?? ExistingHotelId,
+            ExistingHotelRateSettings,
             roomTypeId ?? ExistingRoomTypeId,
             name,
             code ?? RatePlanCode.Create("FLEX-BB"),
