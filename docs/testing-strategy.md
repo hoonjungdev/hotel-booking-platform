@@ -58,7 +58,7 @@ Initial required scenarios:
 - Confirmed reservation cannot expire.
 - Cancelled reservation cannot be confirmed.
 - Total price is calculated by summing daily rates.
-- Cancellation policy determines whether a refund is allowed.
+- Cancellation policy selects the applicable penalty at each advance-notice boundary.
 
 ## Application Use-Case Tests
 

@@ -101,20 +101,28 @@ A simulated reversal related to a payment after cancellation or another permitte
 _Avoid_: Chargeback
 
 **Cancellation Policy**:
-The rule attached to a rate plan that determines whether a confirmed reservation can be cancelled and refunded.
-_Avoid_: Refund policy when the rule also controls cancellation eligibility
+A penalty schedule attached to a rate plan that defines the charge for cancelling a confirmed reservation before check-in. A policy may apply different penalties to different advance-notice periods.
+_Avoid_: Refund policy
+
+**Cancellation Penalty**:
+The charge selected from a cancellation policy according to when the reservation is cancelled, such as no charge, a percentage of the agreed total price, or a number of occupied nights.
+_Avoid_: Cancellation fee when referring to the rule rather than its calculated monetary amount
 
 **Flexible Rate Plan**:
-A rate plan that allows free cancellation until 24 hours before check-in in the first version.
+A rate plan whose cancellation policy includes at least one penalty-free period before check-in. Its exact free-cancellation deadline is defined by the attached cancellation policy.
 _Avoid_: Refundable plan
 
 **Non-refundable Rate Plan**:
-A rate plan that does not allow a refund after reservation confirmation.
+A rate plan whose cancellation policy charges the full agreed stay price when a confirmed reservation is cancelled before check-in.
 _Avoid_: Final sale plan
 
 **Rate Plan**:
 A sellable pricing option for a room type, such as Flexible Breakfast Included or Non-refundable Room Only.
 _Avoid_: Price plan, package
+
+**Rate Plan Code**:
+A hotel-defined operational identifier for a rate plan. Codes are treated without regard to letter case and presented in canonical uppercase.
+_Avoid_: Price plan code, package code
 
 **Daily Rate**:
 The price for a room type under a rate plan on a specific occupied date.
