@@ -140,8 +140,12 @@ _Avoid_: Price plan code, package code
 The price for a room type under a rate plan on a specific occupied date.
 _Avoid_: Static room price
 
+**Requested Occupancy**:
+The actual adult and child guest composition requested for one room in a price quote or reservation.
+_Avoid_: Occupancy when referring to configured room type capacity
+
 **Price Quote**:
-A pre-reservation price calculation for a room type, stay date range, occupancy, and rate plan. A price quote is not itself a reservation.
+A time-limited pre-reservation price offer for one room, a room type, stay date range, requested occupancy, and rate plan. It preserves the quoted nightly prices and cancellation terms but does not reserve inventory or guarantee that the hotel, room type, or rate plan remains sellable.
 _Avoid_: Estimate when the system intends to honor it for a short window
 
 **Reservation Price Snapshot**:

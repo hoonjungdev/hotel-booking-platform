@@ -5,6 +5,7 @@ using HotelBooking.Modules.Inventory;
 using HotelBooking.Modules.Notification;
 using HotelBooking.Modules.Payment;
 using HotelBooking.Modules.Pricing;
+using HotelBooking.Modules.Pricing.Domain.PriceQuotes.ValueObjects;
 using HotelBooking.Modules.Pricing.Domain.References;
 using HotelBooking.Modules.Property;
 
@@ -78,6 +79,20 @@ public class ModuleBoundaryTests
             BindingFlags.Public | BindingFlags.Static);
 
         Assert.Null(publicFactory);
+    }
+
+    [Fact]
+    public void Nightly_price_has_no_public_creation_interface()
+    {
+        ConstructorInfo[] publicConstructors = typeof(NightlyPrice).GetConstructors(
+            BindingFlags.Public | BindingFlags.Instance);
+        MethodInfo[] publicFactories = typeof(NightlyPrice)
+            .GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
+            .Where(method => method.ReturnType == typeof(NightlyPrice))
+            .ToArray();
+
+        Assert.Empty(publicConstructors);
+        Assert.Empty(publicFactories);
     }
 
     [Fact]
