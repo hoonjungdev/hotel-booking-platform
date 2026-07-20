@@ -11,4 +11,10 @@ public sealed record CheckInPolicy(
     TimeOnly? CheckInUntil,
     TimeOnly CheckOutUntil,
     bool AllowsEarlyCheckIn,
-    bool AllowsLateCheckOut);
+    bool AllowsLateCheckOut)
+{
+    private CheckInPolicy()
+        : this(default, null, default, false, false)
+    {
+    }
+}

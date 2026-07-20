@@ -1,8 +1,13 @@
+using HotelBooking.Modules.Property;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
 builder.Services.AddOpenApi();
+builder.Services.AddPropertyModule(
+    builder.Configuration.GetConnectionString("hotelbooking") ??
+    throw new InvalidOperationException("The hotelbooking PostgreSQL connection string is required."));
 
 var app = builder.Build();
 

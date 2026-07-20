@@ -13,4 +13,10 @@ public sealed record Address(
     string City,
     string StreetAddress,
     string? DetailAddress,
-    string? PostalCode);
+    string? PostalCode)
+{
+    private Address()
+        : this(null!, null!, null!, null!, null, null)
+    {
+    }
+}

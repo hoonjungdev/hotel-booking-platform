@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: hotelbooking
       POSTGRES_PASSWORD: hotelbooking
     ports:
-      - "5432:5432"
+      - "15432:5432"
     volumes:
       - hotel-booking-postgres-data:/var/lib/postgresql/data
     healthcheck:

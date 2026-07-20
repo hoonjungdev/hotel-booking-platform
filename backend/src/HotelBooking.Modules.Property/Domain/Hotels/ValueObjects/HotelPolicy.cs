@@ -11,4 +11,10 @@ public sealed record HotelPolicy(
     bool AllowsPets,
     bool AllowsChildren,
     int? MinimumCheckInAge,
-    bool RequiresDeposit);
+    bool RequiresDeposit)
+{
+    private HotelPolicy()
+        : this(false, false, false, null, false)
+    {
+    }
+}

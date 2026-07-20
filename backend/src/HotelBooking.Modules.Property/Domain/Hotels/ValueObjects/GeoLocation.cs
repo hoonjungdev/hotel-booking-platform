@@ -5,4 +5,10 @@ namespace HotelBooking.Modules.Property.Domain.Hotels.ValueObjects;
 /// <param name="Longitude">The longitude coordinate.</param>
 public sealed record GeoLocation(
     decimal Latitude,
-    decimal Longitude);
+    decimal Longitude)
+{
+    private GeoLocation()
+        : this(default, default)
+    {
+    }
+}
