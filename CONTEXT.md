@@ -17,7 +17,7 @@ The module responsible for hotel setup and management. The module may be named P
 _Avoid_: Property as the guest-facing term
 
 **Guest**:
-A person who searches for availability and makes reservations.
+A person who searches for availability and makes reservations. In the first version, a Reservation must reference a Guest already identified by the platform; guest checkout is not supported.
 _Avoid_: Customer, client, user
 
 **Guest Hotel Search**:
