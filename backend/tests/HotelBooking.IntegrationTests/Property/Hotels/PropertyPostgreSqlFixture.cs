@@ -45,14 +45,20 @@ public sealed class PropertyPostgreSqlFixture : IAsyncLifetime
         return new PropertyDbContext(optionsBuilder.Options);
     }
 
-    /// <summary>Removes persisted Hotel rows so each test starts from an isolated database state.</summary>
+    /// <summary>Removes persisted Property module rows so each test starts from an isolated database state.</summary>
     internal async Task ResetAsync()
     {
         await using var connection = new NpgsqlConnection(ConnectionString);
         await connection.OpenAsync();
 
         await using var command = new NpgsqlCommand(
-            "TRUNCATE TABLE property.hotels;",
+            """
+            TRUNCATE TABLE
+                property.room_type_bed_compositions,
+                property.room_types,
+                property.hotels
+            RESTART IDENTITY;
+            """,
             connection);
 
         await command.ExecuteNonQueryAsync();

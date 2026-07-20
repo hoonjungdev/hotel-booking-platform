@@ -1,4 +1,5 @@
 using HotelBooking.Modules.Property.Domain.Hotels;
+using HotelBooking.Modules.Property.Domain.RoomTypes;
 using Microsoft.EntityFrameworkCore;
 
 namespace HotelBooking.Modules.Property.Infrastructure.Persistence;
@@ -19,6 +20,9 @@ internal sealed class PropertyDbContext : DbContext
 
     /// <summary>Gets the persisted Hotel aggregates owned by the Property module.</summary>
     internal DbSet<Hotel> Hotels => Set<Hotel>();
+
+    /// <summary>Gets the persisted Room Type aggregates owned by the Property module.</summary>
+    internal DbSet<RoomType> RoomTypes => Set<RoomType>();
 
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)
